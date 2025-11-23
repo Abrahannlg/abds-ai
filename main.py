@@ -302,8 +302,8 @@ class Sistema:
             self.last_run = run
 
 
-class SADS:
-    def __init__(self, evento, evento_error, config_file="configuraciones/configuracion_SADS.json", camara = True):
+class ABDS:
+    def __init__(self, evento, evento_error, config_file="configuraciones/configuracion_ABDS.json", camara = True):
         self.evento = evento
         self.evento_error = evento_error
         self.logging = self.setup_logging()                         # Configuracion de logger 
@@ -317,16 +317,16 @@ class SADS:
         self.roys = {cam: tuple(coords) for cam, coords in self.configuracion['rois'].items()}      # Carga los roys en diccionarios de configuracion
         self.sound_path = self.configuracion['sound_path']      # Carga los sonidos en diccionarios de configuracion
 
-        self.lock_SADS = threading.Lock()           # Asigna los lock (Estructura de codigo que modifican variables de forma segura)
+        self.lock_ABDS = threading.Lock()           # Asigna los lock (Estructura de codigo que modifican variables de forma segura)
         self.lock_protocolo = threading.Lock()
 
     def setup_logging(self):
         """Metodo de logging, especializado para registar unicamnete con esta clase"""
-        logger = logging.getLogger("SADS")
+        logger = logging.getLogger("ABDS")
         logger.setLevel(logging.DEBUG)
 
         if not logger.handlers:
-            file_handler = logging.FileHandler('logging/configuracion_SADS.log', encoding='utf-8')
+            file_handler = logging.FileHandler('logging/configuracion_ABDS.log', encoding='utf-8')
             formatter = logging.Formatter('%(asctime)s - %(levelname)s /// %(message)s')
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
@@ -438,11 +438,11 @@ class SADS:
                   
                 break
     
-    def sads(self):
+    def abds(self):
         """Metodo principal Sistema Autonomo de Deteccion Snow"""
         global run
 
-        with self.lock_SADS:
+        with self.lock_ABDS:
             while True:
 
                 if run:
@@ -481,17 +481,17 @@ if __name__ == "__main__":
     while run == None:
         time.sleep(1)
     
-    camara1 = SADS(sistema.evento, sistema.evento_error, config_file="configuraciones\configuracion_SADS1.json", camara=camara_global)
-    camara2 = SADS(sistema.evento, sistema.evento_error, config_file="configuraciones\configuracion_SADS2.json", camara=camara_global)
-    camara3 = SADS(sistema.evento, sistema.evento_error, config_file="configuraciones\configuracion_SADS3.json", camara=camara_global)
+    camara1 = ABDS(sistema.evento, sistema.evento_error, config_file="configuraciones\configuracion_ABDS1.json", camara=camara_global)
+    camara2 = ABDS(sistema.evento, sistema.evento_error, config_file="configuraciones\configuracion_ABDS2.json", camara=camara_global)
+    camara3 = ABDS(sistema.evento, sistema.evento_error, config_file="configuraciones\configuracion_ABDS3.json", camara=camara_global)
 
-    a = threading.Thread(target=camara1.sads, args=(), daemon=True)
+    a = threading.Thread(target=camara1.abds, args=(), daemon=True)
     a.start()
 
-    b = threading.Thread(target=camara2.sads, args=(), daemon=True)
+    b = threading.Thread(target=camara2.abds, args=(), daemon=True)
     b.start()
 
-    c = threading.Thread(target=camara3.sads, args=(), daemon=True)
+    c = threading.Thread(target=camara3.abds, args=(), daemon=True)
     c.start()
 
     while True:
